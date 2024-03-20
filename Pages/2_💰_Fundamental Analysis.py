@@ -49,16 +49,16 @@ title_str = st.header(f"{tickers_companies_dict[tickers]}'s {financials}")
 st.download_button("Download file", f"{financials}")
 st.write("""
 ### User manual
-* you can select any of the companies that is a component of the NIFTY 500 index
+* you can select any of the companies that is a component of the **:green[NIFTY 500]** index
 * you can download the selected  Financial documents as a CSV files For Fundamental Analysis
 """)
 #############################
 
 if financials =='Income Statement':
-    df = ticker.income_stmt.reset_index()
-    df.columns = df.columns.astype(str)
-    df.rename(columns={'index':'Income/Expenditure'},inplace=True)
-    AgGrid(df)
+    fin_df = ticker.income_stmt.reset_index()
+    fin_df.columns = fin_df.columns.astype(str)
+    fin_df.rename(columns={'index':'Income/Expenditure'},inplace=True)
+    AgGrid(fin_df)
 
 elif financials =='Quarterly Income Statement':
     st.dataframe(ticker.quarterly_income_stmt, use_container_width=True)

@@ -127,7 +127,7 @@ st.image(image1)
 # st.title("A Technical Analysis Web App")
 st.write("""
 ### User manual
-* you can select any of the companies that is a component of the NIFTY 500 index
+* you can select any of the companies that is a component of the **NIFTY 500** index
 * you can select the time period of your interest
 * you can download the selected data as a CSV file
 * you can add the following Technical Indicators to the plot: Simple Moving 
