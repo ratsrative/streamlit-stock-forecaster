@@ -54,7 +54,6 @@ def load_data(symbol, start_date, end_date):
 
 forecast_models = st.sidebar.selectbox("Select Forecast Models", options=["Prophet", "AutoML"])
 
-
 # Get the Data from Yahoo finance
 df = load_data(tickers, start_date, end_date)
 
@@ -78,10 +77,10 @@ if forecast_models == 'Prophet':
     if df is not None:
         df.rename(columns={'Date':'ds','Adj Close':'y'},inplace=True)
 
-    initial_days = st.sidebar.slider("Initial days", min_value=30, max_value=756, value=200, step=10)
-    period_days = st.sidebar.slider("Period days", min_value=30, max_value=252, value=120, step=10)
-    horizon_days = st.sidebar.slider("Horizon days", min_value=7, max_value=252, value=30, step=1)
-    future_period_days = st.sidebar.slider("Future Forecast Period (days)", min_value=1, max_value=252, value=30,
+    initial_days = st.sidebar.number_input("Initial days", min_value=7, max_value=756, value=200, step=10)
+    period_days = st.sidebar.number_input("Period days", min_value=7, max_value=252, value=10, step=10)
+    horizon_days = st.sidebar.number_input("Horizon days", min_value=7, max_value=252, value=7, step=1)
+    future_period_days = st.sidebar.number_input("Future Forecast Period (days)", min_value=1, max_value=252, value=7,
                                            step=1)
     # Set up parameter grid
     param_grid = {
@@ -193,28 +192,29 @@ elif forecast_models == 'AutoML':
                 xgb_model = XGBRegressor()
             else:
                 exp = TSForecastingExperiment()
-                exp.setup(df,fh=6,fold=5,session_id=42)
+                exp.setup(df,fh=5,fold=5,session_id=42)
                 best_pipelines = exp.compare_models(
-                    sort='MAPE',turbo=False,n_select=5
+                    sort='MAPE',turbo=False,n_select=3
                 )
-                metrics1 = exp.pull()[:5]
+                metrics1 = exp.pull()[:3]
                 st.write(metrics1)
                 # Tune the best pipelines:
                 best_pipelines_tuned = [exp.tune_model(model) for model in best_pipelines]
                 metrics2= exp.pull()
-                st.subheader('The forecast is Made by Blending the Above 5 Fine Tuned Models')
+                st.subheader('The forecast is Made by Blending the Above 3 Fine Tuned Models')
                 st.write(metrics2)
                 # Blended Model
                 blended_model = exp.blend_models(
-                    best_pipelines_tuned, method="mean")
+                    best_pipelines_tuned, method="gmean")
                 # Create the predictions using the blended model and plot the forecasts:,
-                horizon = st.sidebar.slider("Future Forecast Period (days)", min_value=1, max_value=60, value=5,
+                horizon = st.sidebar.number_input("Future Forecast Period (days)", min_value=1, max_value=60, value=5,
                                   step=1)
-                y_pred = exp.predict_model(blended_model)
+                y_pred = exp.predict_model(blended_model,fh=horizon)
                 # final Model
                 final_model = exp.finalize_model(blended_model)
-                y_pred = exp.predict_model(final_model,fh=horizon)
-                # y_pred = pd.DataFrame(y_pred).rename(index={0:'Date','1':'Forecast Price'})
-                st.dataframe(y_pred)
+                y_pred_new = exp.predict_model(final_model,fh=horizon)
+                y_pred_new.reset_index(inplace=True)
+                y_pred_new.rename(columns={'index':'Date','y_pred':'Price Forecast'},inplace=True)
+                st.dataframe(y_pred_new)
                 #Plot Graph
                 exp.plot_model(estimator=final_model,display_format='streamlit')

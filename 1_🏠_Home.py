@@ -9,7 +9,7 @@ from utilities import load_css
 # GitHub: https://github.com/andfanilo/streamlit-lottie
 # Lottie Files: https://lottiefiles.com/
 st.set_page_config(
-    page_title="Hello",
+    page_title="Web Application",
     page_icon="🏠",
 )
 def load_lottiefile(filepath: str):
