@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import yfinance as yf
 import datetime
 import plotly.express as px
@@ -9,6 +8,9 @@ from PIL import Image
 from datetime import datetime
 from st_aggrid import AgGrid
 
+
+class InvalidCompanyNameException(Exception):
+    pass
 
 @st.cache_data
 def get_nifty500_components():
@@ -60,6 +62,8 @@ st.write("""
 """)
 fin_df = None
 try:
+    if tickers_companies_dict[tickers] == 'Company Name':
+        raise InvalidCompanyNameException("Invalid company name: 'Company Name'")
     if financials == 'Income Statement':
         fin_df = ticker.income_stmt.reset_index()
         fin_df.columns = fin_df.columns.astype(str)
@@ -926,7 +930,6 @@ def intrinsic_value(ticker, growth_rate=8, margin_of_safety=0.1):
     return round(intrinsic_value, 2)
 ########################################################################################################################
 
-########################################################################################################################
 col1, col2, col3 = st.columns(3)
 if 'Profitability Ratios' in columns_to_show:
     with col1:
@@ -964,57 +967,3 @@ if 'Operating Ratios' in columns_to_show:
         st.write(f"**Inventory Turnover Ratio** : {Inventory_Turnover_Ratio}")
         st.write(f"**Accounts Receivable Turnover Ratio**: {Accounts_Receivable_Turnover_Ratio}")
         st.write(f"**Days Sales Outstanding**: {Days_Sales_Outstanding}")
-
-########################################################################################################################
-# fin_df = None
-# try:
-#     if financials == 'Income Statement':
-#         fin_df = ticker.income_stmt.reset_index()
-#         fin_df.columns = fin_df.columns.astype(str)
-#         fin_df.rename(columns={'index': 'Income/Expenditure'}, inplace=True)
-#         AgGrid(fin_df)
-#
-#     elif financials == 'Quarterly Income Statement':
-#         fin_df = ticker.quarterly_income_stmt.reset_index()
-#         fin_df.columns = fin_df.columns.astype(str)
-#         fin_df.rename(columns={'index': 'Income/Expenditure'}, inplace=True)
-#         AgGrid(fin_df)
-#     elif financials == 'Balance Sheet':
-#         fin_df = ticker.balance_sheet.reset_index()
-#         fin_df.columns = fin_df.columns.astype(str)
-#         fin_df.rename(columns={'index': 'Assets & Liabilities & Equities'}, inplace=True)
-#         AgGrid(fin_df)
-#     elif financials == 'Quarterly Balance Sheet':
-#         fin_df = ticker.quarterly_balance_sheet.reset_index()
-#         fin_df.columns = fin_df.columns.astype(str)
-#         fin_df.rename(columns={'index': 'Assets & Liabilities & Equities'}, inplace=True)
-#         AgGrid(fin_df)
-#     elif financials == 'Cash Flow Statement':
-#         fin_df = ticker.cash_flow.reset_index()
-#         fin_df.columns = fin_df.columns.astype(str)
-#         fin_df.rename(columns={'index': 'Cash Inflow & Outflow'}, inplace=True)
-#         AgGrid(fin_df)
-#     elif financials == 'Quarterly Cash Flow Statement':
-#         fin_df = ticker.quarterly_cashflow.reset_index()
-#         fin_df.columns = fin_df.columns.astype(str)
-#         fin_df.rename(columns={'index': 'Cash Inflow & Outflow'}, inplace=True)
-#         AgGrid(fin_df)
-# except:
-#     print("Select the Company Name")
-#
-# if fin_df is not None:
-#     AgGrid(fin_df)
-#
-#
-# @st.cache_data
-# def convert_df(dtf):
-#     return dtf.to_csv(index=False).encode('utf-8')
-#
-#
-# if fin_df is not None:
-#     csv = convert_df(fin_df)
-#     st.download_button(
-#         label="Download data as csv",
-#         data=csv,
-#         file_name=f"{financials}" + ".csv",
-#         mime='csv', )
