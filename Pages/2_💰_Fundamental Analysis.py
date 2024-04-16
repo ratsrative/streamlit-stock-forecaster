@@ -8,7 +8,6 @@ from PIL import Image
 from datetime import datetime
 from st_aggrid import AgGrid
 
-
 class InvalidCompanyNameException(Exception):
     pass
 
@@ -52,7 +51,6 @@ financials = st.sidebar.selectbox("Add Financials", ["Income Statement",
                                                      "Quarterly Balance Sheet",
                                                      "Cash Flow Statement",
                                                      "Quarterly Cash Flow Statement"])
-# df = load_data(ticker, start_date, end_date)
 title_str = st.header(f"{tickers_companies_dict[tickers]}'s {financials}")
 
 st.write("""
@@ -135,12 +133,12 @@ columns_to_show = data_exp.multiselect(
 income_statement = ticker.income_stmt
 income_statement = income_statement.reset_index()
 # Calculate PAT (Profit After Tax)
-pat_finalyr = float(income_statement[income_statement['index'] == 'Net Income'].iloc[:, 1])
+pat_finalyr = income_statement[income_statement['index'] == 'Net Income'].iloc[:, 1].iloc[0]
 # Calculate Revenue|
-revenue = float(income_statement[income_statement['index'] == 'Total Revenue'].iloc[:, 1])
+revenue = income_statement[income_statement['index'] == 'Total Revenue'].iloc[:, 1].iloc[0]
 # Calculate PAT Margin (PAT / Revenue)
 pat_margin = round((pat_finalyr / revenue) * 100, 2)  # Multiply by 100 to express in percentage
-pat_3yrs_then = float(income_statement[income_statement['index'] == 'Net Income'].iloc[:, 3])
+pat_3yrs_then = income_statement[income_statement['index'] == 'Net Income'].iloc[:, 3].iloc[0]
 
 # Calculate CAGR (Compound Annual Growth Rate) for PAT
 # Assuming annual data is available, calculate the number of periods (years)
@@ -153,176 +151,180 @@ cagr_pat = round(((pat_finalyr / pat_3yrs_then) ** (1 / num_periods)) - 1, 2) * 
 
 financials = ticker.financials
 financials = financials.reset_index()
-EBITDA_final_yr = float(financials[financials['index'] == 'EBITDA'].iloc[:, 1])
-Operating_Revenue = float(financials[financials['index'] == 'Operating Revenue'].iloc[:, 1])
+try:
+    EBITDA_final_yr = financials[financials['index'] == 'EBITDA'].iloc[:, 1].iloc[0]
+except:
+    EBITDA_final_yr = 0
+Operating_Revenue = financials[financials['index'] == 'Operating Revenue'].iloc[:, 1].iloc[0]
 EBITDA_Margin = round((EBITDA_final_yr / Operating_Revenue) * 100, 2)
-EBITDA_3yrs_then = float(financials[financials['index'] == 'EBITDA'].iloc[:, 3])
+try:
+    EBITDA_3yrs_then = financials[financials['index'] == 'EBITDA'].iloc[:, 3].iloc[0]
+except:
+    EBITDA_3yrs_then = 0
 cagr_EBITDA = ((EBITDA_final_yr / EBITDA_3yrs_then) ** (1 / num_periods)) - 1
 cagr_EBITDA = round(cagr_EBITDA * 100, 2)
-# Print the results
-# print("PAT Margin:",EBITDA_Margin, "%")
-# print("CAGR of EBITDA (for the past 3 years):", cagr_EBITDA * 100, "%")
 
 ## 3.Return On Equity (ROE)
 
-net_income_final = float(income_statement[income_statement['index'] == 'Net Income'].iloc[:, 1])
+net_income_final = income_statement[income_statement['index'] == 'Net Income'].iloc[:, 1].iloc[0]
 balance_sheet = ticker.balance_sheet.reset_index()
-Stockholders_Equity = float(balance_sheet[balance_sheet['index'] == 'Stockholders Equity'].iloc[:, 1])
+Stockholders_Equity = balance_sheet[balance_sheet['index'] == 'Stockholders Equity'].iloc[:, 1].iloc[0]
 ROE = round((net_income_final / Stockholders_Equity) * 100, 2)
 
 ## 4.Return On Assets (ROA)
 
-net_income = float(financials[financials['index'] == 'Net Income'].iloc[:, 1])
+net_income = financials[financials['index'] == 'Net Income'].iloc[:, 1].iloc[0]
 balance_sheet = ticker.balance_sheet.reset_index()
-Total_assets = float(balance_sheet[balance_sheet['index'] == 'Total Assets'].iloc[:, 1])
+Total_assets = balance_sheet[balance_sheet['index'] == 'Total Assets'].iloc[:, 1].iloc[0]
 ROA = round((net_income / Total_assets) * 100, 2)
 
 ## 5.Return On Capital Employed (ROCE)
 
 # Extract necessary financial metric
-EBIT_final_yr = float(financials[financials['index'] == 'EBIT'].iloc[:, 1])
+EBIT_final_yr = financials[financials['index'] == 'EBIT'].iloc[:, 1].iloc[0]
 balance_sheet = ticker.balance_sheet.reset_index()
-Current_Liabilities = float(balance_sheet[balance_sheet['index'] == 'Current Liabilities'].iloc[:, 1])
+Current_Liabilities = balance_sheet[balance_sheet['index'] == 'Current Liabilities'].iloc[:, 1].iloc[0]
 Capital_Employed = Total_assets - Current_Liabilities
 ROCE = round((EBIT_final_yr / Capital_Employed) * 100, 2)
 
 ##############################################II.LEVERAGE RATIOS########################################################
 ## 1.Interest Coverage ratio
-interest_expense = float(income_statement[income_statement["index"] == "Interest Expense"].iloc[:, 1])
+interest_expense = income_statement[income_statement["index"] == "Interest Expense"].iloc[:, 1].iloc[0]
 Interest_Coverage_ratio = round((EBIT_final_yr / interest_expense), 2)
 
 ## 2.Debt to Equity ratio
-Stockholders_Equity = float(balance_sheet[balance_sheet["index"] == "Stockholders Equity"].iloc[:, 1])
-Total_Debt = float(balance_sheet[balance_sheet["index"] == "Total Debt"].iloc[:, 1])
+Stockholders_Equity = balance_sheet[balance_sheet["index"] == "Stockholders Equity"].iloc[:, 1].iloc[0]
+Total_Debt = balance_sheet[balance_sheet["index"] == "Total Debt"].iloc[:, 1].iloc[0]
 
-Capital_Lease_Obligations = float(balance_sheet[balance_sheet["index"] == "Capital Lease Obligations"].iloc[:, 1])
+Capital_Lease_Obligations = balance_sheet[balance_sheet["index"] == "Capital Lease Obligations"].iloc[:, 1].iloc[0]
 
 try:
-    Long_Term_Debt = float(balance_sheet[balance_sheet["index"] == "Long Term Debt"].iloc[:, 1])
-except TypeError:
+    Long_Term_Debt = balance_sheet[balance_sheet["index"] == "Long Term Debt"].iloc[:, 1].iloc[0]
+except:
     Long_Term_Debt = 0
 
 try:
-    Current_Debt_And_Capital_Lease_Obligation = float(
-        balance_sheet[balance_sheet["index"] == "Current Liabilities"].iloc[:, 1])
-except TypeError:
-    Current_Debt_And_Capital_Lease_Obligation = 1
+    Current_Debt_And_Capital_Lease_Obligation = \
+        balance_sheet[balance_sheet["index"] == "Current Liabilities"].iloc[:, 1].iloc[0]
+except:
+    Current_Debt_And_Capital_Lease_Obligation = 0
 try:
-    Current_Liabilities = float(balance_sheet[balance_sheet["index"] == "Current Liabilities"].iloc[:, 1])
+    Current_Liabilities = balance_sheet[balance_sheet["index"] == "Current Liabilities"].iloc[:, 1].iloc[0]
 except TypeError:
     Current_Liabilities = 0
 
 try:
-    Long_Term_Deferred_Taxes_Liabilities = float(
-        balance_sheet[balance_sheet["index"] == "Long Term Deferred Taxes Liabilities"].iloc[:, 1])
-except TypeError:
+    Long_Term_Deferred_Taxes_Liabilities = \
+        balance_sheet[balance_sheet["index"] == "Long Term Deferred Taxes Liabilities"].iloc[:, 1].iloc[0]
+except:
     Long_Term_Deferred_Taxes_Liabilities = 0
 
 try:
-    Dividends_Payable = float(balance_sheet[balance_sheet["index"] == "Dividends Payable"].iloc[:, 1])
-except TypeError:
+    Dividends_Payable = balance_sheet[balance_sheet["index"] == "Dividends Payable"].iloc[:, 1].iloc[0]
+except:
     Dividends_Payable = 0
 
 try:
-    Total_Tax_Payable = float(balance_sheet[balance_sheet["index"] == "Total Tax Payable"].iloc[:, 1])
-except TypeError:
+    Total_Tax_Payable = balance_sheet[balance_sheet["index"] == "Total Tax Payable"].iloc[:, 1].iloc[0]
+except:
     Total_Tax_Payable = 0
 
 try:
-    Accounts_Payable = float(balance_sheet[balance_sheet["index"] == "Accounts Payable"].iloc[:, 1])
-except TypeError:
+    Accounts_Payable = balance_sheet[balance_sheet["index"] == "Accounts Payable"].iloc[:, 1].iloc[0]
+except:
     Accounts_Payable = 0
 
 try:
-    Total_Liabilities_Net_Minority_Interest = float(
-        balance_sheet[balance_sheet["index"] == "Total Liabilities Net Minority Interest"].iloc[:, 1])
-except TypeError:
+    Total_Liabilities_Net_Minority_Interest = \
+        balance_sheet[balance_sheet["index"] == "Total Liabilities Net Minority Interest"].iloc[:, 1].iloc[0]
+except:
     Total_Liabilities_Net_Minority_Interest = 0
 
 try:
-    Total_Non_Current_Liabilities_Net_Minority_Interest = float(
-        balance_sheet[balance_sheet["index"] == "Total Non Current Liabilities Net Minority Interest"].iloc[:, 1])
-except TypeError:
+    Total_Non_Current_Liabilities_Net_Minority_Interest = \
+        balance_sheet[balance_sheet["index"] == "Total Non Current Liabilities Net Minority Interest"].iloc[:, 1].iloc[0]
+except:
     Total_Non_Current_Liabilities_Net_Minority_Interest = 0
 
 try:
-    Long_Term_Provisions = float(balance_sheet[balance_sheet["index"] == "Long Term Provisions"].iloc[:, 1])
-except TypeError:
+    Long_Term_Provisions = balance_sheet[balance_sheet["index"] == "Long Term Provisions"].iloc[:, 1].iloc[0]
+except:
     Long_Term_Provisions = 0
 
 try:
-    Current_Debt = float(balance_sheet[balance_sheet["index"] == "Current Debt"].iloc[:, 1])
-except TypeError:
+    Current_Debt = balance_sheet[balance_sheet["index"] == "Current Debt"].iloc[:, 1].iloc[0]
+except:
     Current_Debt = 0
 
 try:
-    Derivative_Product_Liabilities = float(
-        balance_sheet[balance_sheet["index"] == "Derivative Product Liabilities"].iloc[:, 1])
+    Derivative_Product_Liabilities = \
+        balance_sheet[balance_sheet["index"] == "Derivative Product Liabilities"].iloc[:, 1].iloc[0]
 except:
     Derivative_Product_Liabilities = 0
 
 try:
-    Non_Current_Pension_And_Other_Postretirement_Benefit_Plans = float(
+    Non_Current_Pension_And_Other_Postretirement_Benefit_Plans = \
         balance_sheet[balance_sheet["index"] == "Non Current Pension And Other Postretirement Benefit Plans"].iloc[:,
-        1])
-except TypeError:
+        1].iloc[0]
+except:
     Non_Current_Pension_And_Other_Postretirement_Benefit_Plans = 0
 
 try:
-    Trade_and_Other_Payables_Non_Current = float(
-        balance_sheet[balance_sheet["index"] == "Trade and Other Payables Non Current"].iloc[:, 1])
-except TypeError:
+    Trade_and_Other_Payables_Non_Current = \
+        balance_sheet[balance_sheet["index"] == "Trade and Other Payables Non Current"].iloc[:, 1].iloc[0]
+except:
     Trade_and_Other_Payables_Non_Current = 0
 
 try:
-    Non_Current_Deferred_Revenue = float(
-        balance_sheet[balance_sheet["index"] == "Non Current Deferred Revenue"].iloc[:, 1])
-except TypeError:
+    Non_Current_Deferred_Revenue = \
+        balance_sheet[balance_sheet["index"] == "Non Current Deferred Revenue"].iloc[:, 1].iloc[0]
+except:
     Non_Current_Deferred_Revenue = 0
 
 try:
-    Long_Term_Debt_And_Capital_Lease_Obligation = float(
-        balance_sheet[balance_sheet["index"] == "Long Term Debt And Capital Lease Obligation"].iloc[:, 1])
-except TypeError:
+    Long_Term_Debt_And_Capital_Lease_Obligation = \
+        balance_sheet[balance_sheet["index"] == "Long Term Debt And Capital Lease Obligation"].iloc[:, 1].iloc[0]
+except:
     Long_Term_Debt_And_Capital_Lease_Obligation = 0
 
 try:
-    Current_Notes_Payable = float(balance_sheet[balance_sheet["index"] == "Current Notes Payable"].iloc[:, 1])
-except TypeError:
+    Current_Notes_Payable = balance_sheet[balance_sheet["index"] == "Current Notes Payable"].iloc[:, 1].iloc[0]
+except:
     Current_Notes_Payable = 0
 
 try:
-    Payables_And_Accrued_Expenses = float(
-        balance_sheet[balance_sheet["index"] == "Payables And Accrued Expenses"].iloc[:, 1])
-except TypeError:
+    Payables_And_Accrued_Expenses = \
+        balance_sheet[balance_sheet["index"] == "Payables And Accrued Expenses"].iloc[:, 1].iloc[0]
+except:
     Payables_And_Accrued_Expenses = 0
 
 try:
-    Current_Accrued_Expenses = float(balance_sheet[balance_sheet["index"] == "Current Accrued Expenses"].iloc[:, 1])
-except TypeError:
+    Current_Accrued_Expenses = balance_sheet[balance_sheet["index"] == "Current Accrued Expenses"].iloc[:, 1].iloc[0]
+except:
     Current_Accrued_Expenses = 0
 
 try:
-    Payables = float(balance_sheet[balance_sheet["index"] == "Payables"].iloc[:, 1])
-except TypeError:
+    Payables = balance_sheet[balance_sheet["index"] == "Payables"].iloc[:, 1].iloc[0]
+except:
     Payables = 0
 
-Long_Term_Capital_Lease_Obligation = float(
-    balance_sheet[balance_sheet["index"] == "Long Term Capital Lease Obligation"].iloc[:, 1])
+Long_Term_Capital_Lease_Obligation = \
+    balance_sheet[balance_sheet["index"] == "Long Term Capital Lease Obligation"].iloc[:, 1].iloc[0]
 
 try:
-    Current_Capital_Lease_Obligation = float(
-        balance_sheet[balance_sheet["index"] == "Current Capital Lease Obligation"].iloc[:, 1])
-except TypeError:
+    Current_Capital_Lease_Obligation = \
+        balance_sheet[balance_sheet["index"] == "Current Capital Lease Obligation"].iloc[:, 1].iloc[0]
+except:
     Current_Capital_Lease_Obligation = 0
 
-Total_Liabilities = Total_Debt + Capital_Lease_Obligations + Long_Term_Debt + Current_Debt_And_Capital_Lease_Obligation + Current_Liabilities + \
+Total_Liabilities = (Total_Debt + Capital_Lease_Obligations + Long_Term_Debt + Current_Debt_And_Capital_Lease_Obligation +
+                     Current_Liabilities + \
                     Long_Term_Deferred_Taxes_Liabilities + Dividends_Payable + Total_Tax_Payable + Accounts_Payable + \
                     Total_Liabilities_Net_Minority_Interest + Total_Non_Current_Liabilities_Net_Minority_Interest + \
                     Long_Term_Provisions + Current_Debt + Derivative_Product_Liabilities + Non_Current_Pension_And_Other_Postretirement_Benefit_Plans + \
                     Trade_and_Other_Payables_Non_Current + Non_Current_Deferred_Revenue + Long_Term_Debt_And_Capital_Lease_Obligation + \
                     Current_Notes_Payable + Payables_And_Accrued_Expenses + Current_Accrued_Expenses + Payables + Long_Term_Capital_Lease_Obligation + \
-                    Current_Capital_Lease_Obligation
+                    Current_Capital_Lease_Obligation)
 
 Debt_to_Equity_ratio = round(Total_Liabilities / Stockholders_Equity, 2)
 
@@ -371,7 +373,9 @@ except:
     Prepaid_Assets = 0
 
     Current_Assets = Cash_And_Cash_Equivalents + \
-                     Other_Short_Term_Investments + Accounts_Receivable + Other_Receivables + Receivables + Prepaid_Assets
+                     Other_Short_Term_Investments + \
+                     Accounts_Receivable + Other_Receivables + \
+                     Receivables + Prepaid_Assets
 
 # Calculate Current Liabilities
 if 'Current Debt' in balance_sheet['index'].unique().tolist():
