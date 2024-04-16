@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Stock Market Analysis and Forecasting Dashboard is a comprehensive Streamlit application that provides in-depth analysis and forecasting capabilities for NIFTY 50 companies. The application is divided into four main pages, each focusing on different aspects of stock market analysis and prediction.
+The Stock Market Analysis and Forecasting Dashboard is a comprehensive Streamlit application that provides in-depth analysis and forecasting capabilities for NIFTY 500 companies. The application is divided into four main pages, each focusing on different aspects of stock market analysis and prediction.
 
 ## Features
 
