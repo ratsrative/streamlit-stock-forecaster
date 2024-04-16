@@ -39,7 +39,7 @@ The Stock Market Analysis and Forecasting Dashboard is a comprehensive Streamlit
 
 3. Create a `.env` file in the project root directory and add your API keys:
    ```
-   NEWS_API_KEY=your_news_api_key_here
+   news_api_key=your_news_api_key_here
    ```
 
 4. Run the Streamlit application:
