@@ -1,5 +1,6 @@
 cufflinks
 dask
+dask[distributed]
 dask[dataframe]
 numpy
 packaging
