@@ -10,7 +10,7 @@ st.write("""
 * you can select any of the companies that are components of the **:red[NIFTY 500]** index
 * you can select the  Forecasting Models of Your Interest
 """)
-image1 = Image.open('./Pages/Stock Market Analysis Header.png')
+image1 = Image.open('./pages/Stock Market Analysis Header.png')
 st.image(image1)
 @st.cache_data
 def get_nifty500_components():
