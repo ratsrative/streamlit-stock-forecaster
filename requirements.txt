@@ -14,7 +14,7 @@ dash==2.16.1
 dash-core-components==2.0.0
 dash-html-components==2.0.0
 dash-table==5.0.0
-dask==2022.12.0
+dask==2024.2.1
 decorator==5.1.1
 deprecation==2.1.0
 distributed==2024.2.1
