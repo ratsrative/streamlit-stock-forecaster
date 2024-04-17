@@ -148,7 +148,7 @@ macd_signal_periods = exp_macd.number_input(
     step=1
 )
 
-image1 = Image.open('./Pages/Stock Market Analysis Header.png')
+image1 = Image.open('./pages/Stock Market Analysis Header.png')
 st.image(image1)
 # st.title("A Technical Analysis Web App")
 st.write("""
