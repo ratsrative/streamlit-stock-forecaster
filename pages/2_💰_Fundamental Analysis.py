@@ -29,7 +29,7 @@ def load_data(symbol, start, end):
     return yf.download(symbol, start, end)
 
 
-image1 = Image.open('./Pages/Stock Market Analysis Header.png')
+image1 = Image.open('./pages/Stock Market Analysis Header.png')
 st.image(image1)
 st.sidebar.header("Stock Parameters")
 
