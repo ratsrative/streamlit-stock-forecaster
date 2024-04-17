@@ -15,7 +15,7 @@ class InvalidCompanyNameException(Exception):
     pass
 
 # Header Image
-image1 = Image.open('./Pages/Stock Market Analysis Header.png')
+image1 = Image.open('./pages/Stock Market Analysis Header.png')
 st.image(image1)
 
 # get nifty500 data
