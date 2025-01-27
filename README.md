@@ -72,7 +72,7 @@ The Stock Market Analysis and Forecasting Dashboard is a comprehensive Streamlit
 
 The Stock Market Analysis and Forecasting Dashboard provides a powerful and user-friendly tool for investors and analysts to explore the stock market. By leveraging various analytical techniques and forecasting models, the application aims to help users make informed investment decisions.
 
-![Youtube-Demo](https://youtu.be/azvRbWnJl1A)
+[Youtube-Demo](https://youtu.be/azvRbWnJl1A)
 
 https://github.com/user-attachments/assets/140715e6-e2d9-4486-80dd-e2a795cf18df
 
