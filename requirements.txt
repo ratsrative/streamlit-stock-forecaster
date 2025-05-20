@@ -1,3 +1,4 @@
+lxml
 streamlit-aggrid
 scikit-learn
 cufflinks
