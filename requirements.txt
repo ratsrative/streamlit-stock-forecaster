@@ -1,3 +1,5 @@
+
+scikit-learn
 cufflinks
 dask
 dask[distributed]
